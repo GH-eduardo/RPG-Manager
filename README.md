@@ -22,3 +22,5 @@ sa
 ```
 
 ### e não tem senha
+
+### OBS: Quando a aplicação é iniciada são adicionados alguns registros diretamente no banco de dados através do arquivo import.sql para facilitar os testes das rotas 
