@@ -6,6 +6,7 @@ import com.rpg.management.entities.Character;
 import com.rpg.management.entities.MagicItem;
 import com.rpg.management.enums.ItemCategory;
 import com.rpg.management.repositories.CharacterRepository;
+import com.rpg.management.repositories.MagicItemRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +20,9 @@ public class CharacterService {
 
     @Autowired
     private CharacterRepository characterRepository;
+
+    @Autowired
+    private MagicItemRepository magicItemRepository;
 
     public ResponseEntity<Character> createCharacter(CreateCharacterDTO characterDto) {
         Character newCharacter = new Character(characterDto.getName(), characterDto.getAdventurerName(), characterDto.getCharacterClass(), characterDto.getForce(), characterDto.getDefence());
@@ -54,11 +58,9 @@ public class CharacterService {
         if(characterOpt.isPresent()) {
             Character character = characterOpt.get();
             List<MagicItem> magicItems = character.getMagicItems();
-            MagicItem amulet;
             for (MagicItem item : magicItems) {
                 if (item.getItemCategory().equals(ItemCategory.AMULET)) {
-                    amulet = item;
-                    return amulet;
+                    return item;
                 }
             }
         }
@@ -81,18 +83,25 @@ public class CharacterService {
         }).orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body(null));
     }
 
-    public ResponseEntity<Character> addMagicItemToCharacter(Long id, MagicItem magicItem) {
-        if(findAmulet(id) != null) {
-            return characterRepository.findById(id).map(character -> {
-                magicItem.setItemOwner(character);
-                character.getMagicItems().add(magicItem);
-                character.setForce(character.getForce() + magicItem.getForce());
-                character.setDefence(character.getDefence() + magicItem.getDefense());
-                Character updatedCharacter = characterRepository.save(character);
-                return ResponseEntity.ok(updatedCharacter);
+    public ResponseEntity<?> addMagicItemToCharacter(Long characterId, Long magicItemId) {
+        if(findAmulet(characterId) == null) {
+            return characterRepository.findById(characterId).map(character -> {
+                Optional<MagicItem> magicItemOpt = magicItemRepository.findById(magicItemId);
+
+                if(magicItemOpt.isPresent()) {
+                    MagicItem magicItem = magicItemOpt.get();
+                    character.getMagicItems().add(magicItem);
+                    magicItem.setItemOwner(character);
+                    magicItemRepository.save(magicItem);
+                    character.setForce(character.getForce() + magicItem.getForce());
+                    character.setDefence(character.getDefence() + magicItem.getDefense());
+                    Character updatedCharacter = characterRepository.save(character);
+                    return ResponseEntity.ok(updatedCharacter);
+                }
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(character);
             }).orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body(null));
         } else {
-            throw new RuntimeException("Only one amulet is allowed per Character!");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Only one amulet per Character is allowed!");
         }
     }
 
@@ -107,6 +116,10 @@ public class CharacterService {
             }
             if (itemToRemove != null) {
                 character.getMagicItems().remove(itemToRemove);
+                itemToRemove.setItemOwner(null);
+                magicItemRepository.save(itemToRemove);
+                character.setForce(character.getForce() - itemToRemove.getForce());
+                character.setDefence(character.getDefence() - itemToRemove.getDefense());
                 Character updatedCharacter = characterRepository.save(character);
                 return ResponseEntity.ok(updatedCharacter);
             } else {

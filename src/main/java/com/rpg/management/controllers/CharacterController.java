@@ -51,13 +51,13 @@ public class CharacterController {
     }
 
     @PatchMapping(value = "add-magic-item")
-    public ResponseEntity<Character> addMagicItemToCharacter(@RequestParam Long id, @Valid @RequestBody MagicItem magicItem) {
-        return characterService.addMagicItemToCharacter(id, magicItem);
+    public ResponseEntity<?> addMagicItemToCharacter(@RequestParam Long characterId, @RequestParam Long magicItemId) {
+        return characterService.addMagicItemToCharacter(characterId, magicItemId);
     }
 
     @PatchMapping(value = "remove-magic-item")
-    public ResponseEntity<Character> removeMagicItemFromCharacter(@RequestParam Long characterId, @Valid @RequestParam Long itemId) {
-        return characterService.removeMagicItemFromCharacter(characterId, itemId);
+    public ResponseEntity<Character> removeMagicItemFromCharacter(@RequestParam Long characterId, @Valid @RequestParam Long magicItemId) {
+        return characterService.removeMagicItemFromCharacter(characterId, magicItemId);
     }
 
     @DeleteMapping

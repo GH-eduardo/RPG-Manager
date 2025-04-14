@@ -17,8 +17,11 @@ public class MagicItemService {
     @Autowired
     private MagicItemRepository magicItemRepository;
 
-    public ResponseEntity<MagicItem> createMagicItem(CreateMagicItemDTO magicItemDTO) {
+    public ResponseEntity<?> createMagicItem(CreateMagicItemDTO magicItemDTO) {
         MagicItem newMagicItem = new MagicItem(magicItemDTO.getName(), magicItemDTO.getItemCategory(), magicItemDTO.getForce(), magicItemDTO.getDefense());
+        if(magicItemDTO.getDefense() == 0 && magicItemDTO.getForce() == 0) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("A magicItem must not have 0 force and 0 defence at the same time!");
+        }
         magicItemRepository.save(newMagicItem);
         return ResponseEntity.status(HttpStatus.CREATED).body(newMagicItem);
     }

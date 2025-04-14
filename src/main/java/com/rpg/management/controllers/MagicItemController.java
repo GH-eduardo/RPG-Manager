@@ -19,7 +19,7 @@ public class MagicItemController {
     private MagicItemService magicItemService;
 
     @PostMapping
-    public ResponseEntity<MagicItem> createMagicItem(@Valid @RequestBody CreateMagicItemDTO magicItemDTO) {
+    public ResponseEntity<?> createMagicItem(@Valid @RequestBody CreateMagicItemDTO magicItemDTO) {
         return magicItemService.createMagicItem(magicItemDTO);
     }
 
