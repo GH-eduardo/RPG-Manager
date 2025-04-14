@@ -13,7 +13,7 @@ localhost:8080/h2-console/
 
 ### Inserir no campo 'JDBC URL:' o seguinte:
 ```
-h2:mem:testdb
+jdbc:h2:mem:testdb
 ```
 
 ### o nome de usuário é:
