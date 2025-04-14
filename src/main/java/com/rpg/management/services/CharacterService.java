@@ -98,8 +98,8 @@ public class CharacterService {
                     Character updatedCharacter = characterRepository.save(character);
                     return ResponseEntity.ok(updatedCharacter);
                 }
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(character);
-            }).orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body(null));
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(String.format("The MagicItem with id %d was not found!", magicItemId));
+            }).orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body(String.format("The Character with id %d was not found!", characterId)));
         } else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Only one amulet per Character is allowed!");
         }
